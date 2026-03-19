@@ -1,0 +1,15 @@
+{
+    "number_of_segments": 2,
+    "segments": [
+        {
+            "segment_id": 1,
+            "start_line": [0.0, 0.0, 0.0],
+            "end_line": [1.0, 1.0, 0.0]
+        },
+        {
+            "segment_id": 2,
+            "start_line": [0.0, 0.0, 0.0],
+            "end_line": [-1.0, 1.0, 0.0]
+        }
+    ]
+}
