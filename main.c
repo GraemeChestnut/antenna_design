@@ -5,83 +5,14 @@
 #include <complex.h>
 #include <cjson/cJSON.h>
 
-typedef struct{
-        float start_line[3];
-        float end_line[3];
-    } Segment;
+#include "antenna.h"
+#include "segment.h"
 
 
-Segment* init_antenna(int *n)
-{
-    
-
-
-    //JSON MUMBO JUMBO
-        FILE *fp = fopen("antenna.json", "r");
-        if (fp == NULL) {
-            printf("Error: Unable to open the file.\n");
-        }
-
-        // read the file contents into a string
-        char buffer[1024];
-        int len = fread(buffer, 1, sizeof(buffer), fp);
-        buffer[len] = '\0'; // null-terminate the string
-        fclose(fp);
-        
-
-        // parse the JSON data
-        cJSON *json = cJSON_Parse(buffer);
-
-        if (json == NULL) {
-            const char *error_ptr = cJSON_GetErrorPtr();
-            if (error_ptr != NULL) {
-                printf("Error: %s\n", error_ptr);
-            }
-            cJSON_Delete(json);
-        }
-
-    
-        /*--------------------------------------------------------------------------------------------*/
-    
-    
-        /*important!!!!! this code parses through to get the first value of the first segment. 
-    For next time, recure throuhg this in order to grab all six values for the one segment. 
-    This will allow us to store them in a segment struct, 
-    and then add that segment to the antenan struct, and thn we are abe to display it on the screen.*/
-
-    cJSON *number_of_segments = cJSON_GetObjectItem(json, "number_of_segments");    
-    *n = number_of_segments->valueint;
-
-    Segment *Antenna = malloc((*n) * sizeof(Segment));
-    
-        
-    for(int i = 0; i < *n; ++i){
-        cJSON *segments = cJSON_GetObjectItem(json, "segments");
-        cJSON *first_segment = cJSON_GetArrayItem(segments,  i);
-
-        for(int k = 0; k < 3; k++){
-            cJSON *start_line = cJSON_GetObjectItem(first_segment, "start_line");
-            cJSON *start_line_value = cJSON_GetArrayItem(start_line, k);
-             
-            cJSON *end_line = cJSON_GetObjectItem(first_segment, "end_line");
-            cJSON *end_line_value = cJSON_GetArrayItem(end_line, k);
-            
-            //printf("%f ", start_line_value->valuedouble);
-
-            Antenna[i].start_line[k] = start_line_value->valuedouble;
-            Antenna[i].end_line[k] = end_line_value->valuedouble;
-        }
-        printf("\n");
-    }
-
-
-    
-    /*--------------------------------------------------------------------------------------------*/
-    return Antenna;
-}
 
 int main(void)
 {
+   // int six_seven = edit_antenna();
     // Initialization
     //--------------------------------------------------------------------------------------
     const int screenWidth = 800;
@@ -89,6 +20,7 @@ int main(void)
 
     int n;
     Segment* Antenna = init_antenna(&n);
+    if(Antenna == NULL){printf("ERROR: ANTENNA CONFIGURATION INCORRECT. PLEASE CHECK JSON FILE");return 1;}
 
     InitWindow(screenWidth, screenHeight, "raylib [core] example - 3d camera free");
     
@@ -130,27 +62,31 @@ int main(void)
             
            // printf("%ld", sizeof(Antenna));
 
+           if (Antenna != NULL){
+           //printf("antenna succesffuly rendered");
+                for (int i = 0; i < n; ++i) {
+                    DrawLine3D(
+                        (Vector3){
+                            Antenna[i].start_line[0],
+                            Antenna[i].start_line[1],
+                            Antenna[i].start_line[2]
+                        },
+                        (Vector3){
+                            Antenna[i].end_line[0],
+                            Antenna[i].end_line[1],
+                            Antenna[i].end_line[2]
+                        },
+                        BLACK
+                    );
+                    printf("antenna succesffuly rendered");
+                }
+            } else{printf("antenna unsuccesffuly rendered.\n ABORTED LOADING"); return 1;}
 
-            for (int i = 0; i < n; ++i) {
-                DrawLine3D(
-                    (Vector3){
-                        Antenna[i].start_line[0],
-                        Antenna[i].start_line[1],
-                        Antenna[i].start_line[2]
-                    },
-                    (Vector3){
-                        Antenna[i].end_line[0],
-                        Antenna[i].end_line[1],
-                        Antenna[i].end_line[2]
-                    },
-                    BLACK
-                );
-            }
-           
-            DrawLine3D((Vector3){0.0f,0.0f,0.0f},(Vector3){10.0f,0.0f,0.0f},ORANGE);
-            DrawLine3D((Vector3){0.0f,0.0f,0.0f},(Vector3){0.0f,10.0f,0.0f},BLUE);
-            DrawLine3D((Vector3){0.0f,0.0f,0.0f},(Vector3){0.0f,0.0f,10.0f},GREEN);
+                DrawLine3D((Vector3){0.0f,0.0f,0.0f},(Vector3){10.0f,0.0f,0.0f},ORANGE);
+                DrawLine3D((Vector3){0.0f,0.0f,0.0f},(Vector3){0.0f,10.0f,0.0f},BLUE);
+                DrawLine3D((Vector3){0.0f,0.0f,0.0f},(Vector3){0.0f,0.0f,10.0f},GREEN);
 
+            
             EndMode3D();
 
             DrawRectangle(10, 10, 320, 93, Fade(SKYBLUE, 0.5f));
@@ -171,7 +107,7 @@ int main(void)
     //--------------------------------------------------------------------------------------
     CloseWindow();        // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
-    free(Antenna);
+    
     return 0;
 }
 
