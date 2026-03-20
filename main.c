@@ -6,9 +6,10 @@
 #include <cjson/cJSON.h>
 
 #include "antenna.h"
-#include "segment.h"
+#include "segment.h"  
 
-
+#define RAYGUI_IMPLEMENTATION
+#include "raygui.h"
 
 int main(void)
 {
@@ -22,7 +23,7 @@ int main(void)
     Segment* Antenna = init_antenna(&n);
     if(Antenna == NULL){printf("ERROR: ANTENNA CONFIGURATION INCORRECT. PLEASE CHECK JSON FILE");return 1;}
 
-    InitWindow(screenWidth, screenHeight, "raylib [core] example - 3d camera free");
+    InitWindow(screenWidth, screenHeight, "Ant");
     
 
     // Define the camera to look into our 3d world
@@ -34,15 +35,14 @@ int main(void)
     camera.projection = CAMERA_PERSPECTIVE;             // Camera projection type
 
     Vector3 cubePosition = { 0.0f, 0.0f, 0.0f };
-
-    DisableCursor();                  
-
+                 
     SetTargetFPS(60);                   // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
 
     // Main game loop
     while (!WindowShouldClose())        // Detect window close button or ESC key
     {
+        Vector2 mouse_position = GetMousePosition();
         // Update
         UpdateCamera(&camera, CAMERA_ORBITAL);
         //----------------------------------------------------------------------------------
@@ -78,26 +78,46 @@ int main(void)
                         },
                         BLACK
                     );
-                    printf("antenna succesffuly rendered");
                 }
             } else{printf("antenna unsuccesffuly rendered.\n ABORTED LOADING"); return 1;}
 
-                DrawLine3D((Vector3){0.0f,0.0f,0.0f},(Vector3){10.0f,0.0f,0.0f},ORANGE);
-                DrawLine3D((Vector3){0.0f,0.0f,0.0f},(Vector3){0.0f,10.0f,0.0f},BLUE);
-                DrawLine3D((Vector3){0.0f,0.0f,0.0f},(Vector3){0.0f,0.0f,10.0f},GREEN);
+                DrawLine3D((Vector3){0.0f,0.0f,0.0f},(Vector3){7.5f,0.0f,0.0f},ORANGE);
+                DrawLine3D((Vector3){0.0f,0.0f,0.0f},(Vector3){0.0f,6.0f,0.0f},BLUE);
+                DrawLine3D((Vector3){0.0f,0.0f,0.0f},(Vector3){0.0f,0.0f,7.5f},GREEN);
 
+                
+                
             
             EndMode3D();
 
-            DrawRectangle(10, 10, 320, 93, Fade(SKYBLUE, 0.5f));
-            DrawRectangleLines( 10, 10, 320, 93, BLUE);
+            Rectangle button_size = {700, 0, 100, 50};
 
-            DrawText("Free camera default controls:", 20, 20, 10, BLACK);
-            DrawText("- Mouse Wheel to Zoom in-out", 40, 40, 10, DARKGRAY);
-            DrawText("- Mouse Wheel Pressed to Pan", 40, 60, 10, DARKGRAY);
-            DrawText("- Z to zoom to (0, 0, 0)", 40, 80, 10, DARKGRAY);
+            int edit_antenna_button = GuiButton(button_size, "Edit Antenna");
+            static int show_input = 0;
+            static int close_input = -1;
+            char message[10];
 
+            if (edit_antenna_button == 1)
+            {
+                show_input = 1;
+                close_input = -1;
+                message[0] = '\0';
+            }
             
+            
+            if((show_input == 1 && close_input == -1 )){
+
+                int is_input_box_open = GuiTextInputBox((Rectangle){300, 300, 200, 200}, "Edit Antenna","Please input a float in \norder to choose antenna's x value", "hello", message, 100, false); 
+                
+                close_input = is_input_box_open;
+
+                if(IsKeyPressed(KEY_ENTER)){
+                    close_input = 1;
+                }
+                if(close_input == 1 || IsKeyPressed(KEY_ENTER)){
+                    printf("%s\n", message);
+                }
+            }
             
         EndDrawing();
         //----------------------------------------------------------------------------------

@@ -1,13 +1,20 @@
 #include <stdio.h>
+#include "raylib.h"
 #include <stdlib.h>
 #include <math.h>
 #include <cjson/cJSON.h>
 #include "segment.h"
 
-
+#include "raygui.h"
 
 int edit_antenna(void){
     // create a cJSON object
+    
+    // -1 is open. 0 is close, 1 is press button
+
+    printf("%d\n", text_input);
+    
+
     printf("Editing Antenna\n");
     cJSON *json = cJSON_CreateObject();
     cJSON_AddStringToObject(json, "name", "John Doe");
@@ -32,5 +39,6 @@ int edit_antenna(void){
     cJSON_free(json_str);
     cJSON_Delete(json);
     printf("Antenna successfully edited\n"); return 0;
+
 
 }

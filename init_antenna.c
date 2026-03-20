@@ -34,23 +34,17 @@ Segment* init_antenna(int *n)
             }
             cJSON_Delete(json);
         }
+    //
 
-    
-        /*--------------------------------------------------------------------------------------------*/
-    
-    
-        /*important!!!!! this code parses through to get the first value of the first segment. 
-    For next time, recure throuhg this in order to grab all six values for the one segment. 
-    This will allow us to store them in a segment struct, 
-    and then add that segment to the antenan struct, and thn we are abe to display it on the screen.*/
+    cJSON *number_of_segments = cJSON_GetObjectItem(json, "number_of_segments");  
 
-    cJSON *number_of_segments = cJSON_GetObjectItem(json, "number_of_segments");    
-   // if (!number_of_segments) return NULL;
+    if(number_of_segments == NULL){return NULL;} 
+
     *n = number_of_segments->valueint;
 
     Segment *Antenna = malloc((*n) * sizeof(Segment));
-    
-        cJSON *segments = cJSON_GetObjectItem(json, "segments");
+    cJSON *segments = cJSON_GetObjectItem(json, "segments");
+
     for(int i = 0; i < *n; ++i){
         cJSON *first_segment = cJSON_GetArrayItem(segments,  i);
 
@@ -69,7 +63,6 @@ Segment* init_antenna(int *n)
         printf("\n");
     }
 
-    printf("antenna intialized properly");
     /*--------------------------------------------------------------------------------------------*/
     return Antenna;
 }
