@@ -13,22 +13,25 @@
 
 int main(void)
 {
-   // int six_seven = edit_antenna();
-    // Initialization
+      // Initialization
     //--------------------------------------------------------------------------------------
     const int screenWidth = 800;
     const int screenHeight = 800;
-
+    
     int n;
-    Segment* Antenna = init_antenna(&n);
-    if(Antenna == NULL){printf("ERROR: ANTENNA CONFIGURATION INCORRECT. PLEASE CHECK JSON FILE");return 1;}
+    Segment* Antenna = init_antenna(&n);    
+
+    if(Antenna == NULL){printf("ERROR: ANTENNA CONFIGURATION INCORRECT. PLEASE CHECK JSON FILE\n");return 1;}
+    
+    //split each segments into more segments in order to do more math //
+
 
     InitWindow(screenWidth, screenHeight, "Ant");
     
 
     // Define the camera to look into our 3d world
     Camera3D camera = { 0 };
-    camera.position = (Vector3){ 10.0f, 10.0f, 10.0f }; // Camera position
+    camera.position = (Vector3){ 20.0f, 20.0f, 20.0f }; // Camera position
     camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };      // Camera looking at point
     camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };          // Camera up vector (rotation towards target)
     camera.fovy = 45.0f;                                // Camera field-of-view Y
@@ -61,7 +64,7 @@ int main(void)
             BeginMode3D(camera);
             
            // printf("%ld", sizeof(Antenna));
-
+            //drawing antenna
            if (Antenna != NULL){
            //printf("antenna succesffuly rendered");
                 for (int i = 0; i < n; ++i) {

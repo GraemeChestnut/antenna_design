@@ -12,7 +12,7 @@ int edit_antenna(void){
     
     // -1 is open. 0 is close, 1 is press button
 
-    printf("%d\n", text_input);
+//    printf("%d\n", text_input);
     
 
     printf("Editing Antenna\n");

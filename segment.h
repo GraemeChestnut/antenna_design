@@ -4,6 +4,7 @@
 typedef struct{
         float start_line[3];
         float end_line[3];
+        float current;
 } Segment;
 
 #endif
