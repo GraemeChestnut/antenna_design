@@ -58,7 +58,7 @@ Segment* init_antenna(int *n) {
     
     float magnitude; 
 
-    Segment plc_antenna[1]; //create placeholder values for json coordinates. Needed to find total number of sub segments within each segment, since you need the magnitude of each line.
+    Segment plc_antenna[*n+1]; //create placeholder values for json coordinates. Needed to find total number of sub segments within each segment, since you need the magnitude of each line.
 
     for(int i = 0; i < *n; ++i){ //iterate over each segment that is in JSON file
         cJSON *first_segment = cJSON_GetArrayItem(segments,  i);
