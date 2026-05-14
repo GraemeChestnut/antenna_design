@@ -7,4 +7,6 @@ typedef struct{
         float current;
 } Segment;
 
+void current_distribution(Segment *Antenna, int size);
+
 #endif

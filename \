@@ -21,7 +21,7 @@ int main(void)
     int n;
     Segment* Antenna = init_antenna(&n);    
 
-    current_distribution(Antenna, n);
+    float* current_dist = current_distribution(Antenna);
 
     if(Antenna == NULL){printf("ERROR: ANTENNA CONFIGURATION INCORRECT. PLEASE CHECK JSON FILE\n");return 1;}
     
@@ -65,50 +65,48 @@ int main(void)
 
             BeginMode3D(camera);
             
-           //printf("%ld", sizeof(Antenna));
+           // printf("%ld", sizeof(Antenna));
             //drawing antenna
-            if (Antenna != NULL) {
-              for (int i = 0; i < n; ++i) {
+          if (Antenna != NULL) {
 
-                printf(
-                  "Segment %d | "
-                  "Start: (%f, %f, %f) -> "
-                  "End: (%f, %f, %f) | "
-                  "Current: %f\n",
+    for (int i = 0; i < n; ++i) {
 
-                    i,
+        printf(
+            "Segment %d | "
+            "Start: (%f, %f, %f) -> "
+            "End: (%f, %f, %f)\n",
+            i,
 
-                      Antenna[i].start_line[0],
-                      Antenna[i].start_line[1],
-                      Antenna[i].start_line[2],
+            Antenna[i].start_line[0],
+            Antenna[i].start_line[1],
+            Antenna[i].start_line[2],
 
-                      Antenna[i].end_line[0],
-                      Antenna[i].end_line[1],
-                      Antenna[i].end_line[2],
+            Antenna[i].end_line[0],
+            Antenna[i].end_line[1],
+            Antenna[i].end_line[2]
+        );
 
-                      Antenna[i].current
-                );
+        DrawLine3D(
+            (Vector3){
+                Antenna[i].start_line[0],
+                Antenna[i].start_line[1],
+                Antenna[i].start_line[2]
+            },
+            (Vector3){
+                Antenna[i].end_line[0],
+                Antenna[i].end_line[1],
+                Antenna[i].end_line[2]
+            },
+            BLACK
+        );
+    }
 
-                DrawLine3D(
-                    (Vector3){
-                      Antenna[i].start_line[0],
-                      Antenna[i].start_line[1],
-                      Antenna[i].start_line[2]
-                      },
-                    (Vector3){
-                      Antenna[i].end_line[0],
-                      Antenna[i].end_line[1],
-                      Antenna[i].end_line[2]
-                      },
-                BLACK
-                );
-              }
+} else {
 
-        } else {
-            printf("antenna unsuccessfully rendered.\nABORTED LOADING\n");
-            return 1;
-            } 
- 
+    printf("antenna unsuccessfully rendered.\nABORTED LOADING\n");
+    return 1;
+} 
+
                 DrawLine3D((Vector3){0.0f,0.0f,0.0f},(Vector3){7.5f,0.0f,0.0f},ORANGE);
                 DrawLine3D((Vector3){0.0f,0.0f,0.0f},(Vector3){0.0f,7.5f,0.0f},BLUE);
                 DrawLine3D((Vector3){0.0f,0.0f,0.0f},(Vector3){0.0f,0.0f,7.5f},GREEN);
