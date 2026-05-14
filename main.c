@@ -31,7 +31,7 @@ int main(void)
 
     // Define the camera to look into our 3d world
     Camera3D camera = { 0 };
-    camera.position = (Vector3){ 20.0f, 20.0f, 20.0f }; // Camera position
+    camera.position = (Vector3){ 10.0f, 10.0f, 10.0f }; // Camera position
     camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };      // Camera looking at point
     camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };          // Camera up vector (rotation towards target)
     camera.fovy = 45.0f;                                // Camera field-of-view Y
@@ -85,7 +85,7 @@ int main(void)
             } else{printf("antenna unsuccesffuly rendered.\n ABORTED LOADING"); return 1;}
 
                 DrawLine3D((Vector3){0.0f,0.0f,0.0f},(Vector3){7.5f,0.0f,0.0f},ORANGE);
-                DrawLine3D((Vector3){0.0f,0.0f,0.0f},(Vector3){0.0f,6.0f,0.0f},BLUE);
+                DrawLine3D((Vector3){0.0f,0.0f,0.0f},(Vector3){0.0f,7.5f,0.0f},BLUE);
                 DrawLine3D((Vector3){0.0f,0.0f,0.0f},(Vector3){0.0f,0.0f,7.5f},GREEN);
 
                 

@@ -52,18 +52,19 @@ Segment* init_antenna(int *n) {
     //SET ANTENNA_CONSTANTS
     float wavelength = C / frequency_value; // wavelength of electron is c/f
     float sample_length = wavelength/sample_rate; //sample_length is 1/10 of the wavelength
-    int total_segments;
+    int total_segments = 0;
     float num_sub_segments[*n];
+    int sub_segments;
     
     float magnitude; 
 
-    Segment *Antenna = malloc((*n * sample_rate) * (sizeof(Segment))); //allocated alloted 
     Segment plc_antenna[1]; //create placeholder values for json coordinates. Needed to find total number of sub segments within each segment, since you need the magnitude of each line.
 
-    for(int i = 0; i < *n; ++i){
+    int idx = 0; //global index for each subsemgne 
+    for(int i = 0; i < *n; ++i){ //iterate over each segment that is in JSON file
         cJSON *first_segment = cJSON_GetArrayItem(segments,  i);
         
-            for(int k = 0; k < 3; k++){
+            for(int k = 0; k < 3; k++){ // make placeholder values for each segment in JSON
                 cJSON *start_line = cJSON_GetObjectItem(first_segment, "start_line");
                 cJSON *start_line_value = cJSON_GetArrayItem(start_line, k);
              
@@ -76,29 +77,49 @@ Segment* init_antenna(int *n) {
             }
             
             //find magnitude of i segment
-            magnitude = sqrt(
-                pow(plc_antenna[0].start_line[0] - plc_antenna[0].end_line[0] , 2) +
-                pow(plc_antenna[0].start_line[1] - plc_antenna[0].end_line[1] , 2) +
-                pow(plc_antenna[0].start_line[2] - plc_antenna[0].end_line[2] , 2));
+            magnitude = sqrt( //calculate magnitude to see how many sub semgnet
+                pow(plc_antenna[i].start_line[0] - plc_antenna[i].end_line[0] , 2) +
+                pow(plc_antenna[i].start_line[1] - plc_antenna[i].end_line[1] , 2) +
+                pow(plc_antenna[i].start_line[2] - plc_antenna[i].end_line[2] , 2));
             
                 
             //compute number of necceasry sub segments inside of each segment, absed on the magnitune of that segmnet. ie, more sub_semgent sfor large line
-            int sub_segments = ceil( magnitude / sample_length);
-
+            sub_segments = ceil( magnitude / sample_length);
+            total_segments += sub_segments;
             //interate over number of sub_segments, and then knowning the sample_legnthfinally add true subsemgne initalization to main Antenna variabel
-            
-            for(int m = 0; m < sub_segments; ++m){
+      }
+  
+      Segment *Antenna = malloc(total_segments * sizeof(Segment));
+      
+      for(int i = 0; i < *n; ++i){
+            for(int m = 0; m < sub_segments; ++m){ // iterate over each sub segment within the segemnt
               //l looks too much like an i, we're using m cuz i can
             
-              for(int o = 0; o < 3; ++o){
-                  //insert code calaculating individual start/end points for each new line segment, its place should be building off of the previous line semgnet; segment[m].start_line = segment[m-1].end_line
-                  //
-                  //
+              for(int o = 0; o < 3; ++o){// iteatee over each coordinate within each segment
+
+                 //insert code calaculating individual start/end points for each new line segment, its place should be building off of the previous line semgnet; segment[m].start_line = segment[m-1].end_line
+                  
+                  //if m = 0, then just add the startlines diretctly in
+                  if(m == 0){
+                    Antenna[idx].start_line[o] = plc_antenna[i].start_line[o];
+                  } 
+                  else{
+                    Antenna[idx].start_line[o] = Antenna[idx -1].end_line[o];
+                  }
+                  
+                  //if m = sub_semgnets-1, the just add the endline directly line
+                  
+                  if(m == (sub_segments-1)){
+                    Antenna[idx].end_line[o] = plc_antenna[i].end_line[o-1];
+                  }
+                  else{
+
+                    float cartesian_distance = (plc_antenna[i].end_line[o] - plc_antenna[i].start_line[o]) / sub_segments;
+                    Antenna[idx].end_line[o] = Antenna[idx].start_line[o] + (cartesian_distance);
+                  }
               }
             }
-                                        
-    
-
+            idx++;
     }
 
     /*--------------------------------------------------------------------------------------------*/
