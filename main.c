@@ -65,24 +65,45 @@ int main(void)
             
            // printf("%ld", sizeof(Antenna));
             //drawing antenna
-           if (Antenna != NULL){
-           //printf("antenna succesffuly rendered");
-                for (int i = 0; i < n; ++i) {
-                    DrawLine3D(
-                        (Vector3){
-                            Antenna[i].start_line[0],
-                            Antenna[i].start_line[1],
-                            Antenna[i].start_line[2]
-                        },
-                        (Vector3){
-                            Antenna[i].end_line[0],
-                            Antenna[i].end_line[1],
-                            Antenna[i].end_line[2]
-                        },
-                        BLACK
-                    );
-                }
-            } else{printf("antenna unsuccesffuly rendered.\n ABORTED LOADING"); return 1;}
+          if (Antenna != NULL) {
+
+    for (int i = 0; i < n; ++i) {
+
+        printf(
+            "Segment %d | "
+            "Start: (%f, %f, %f) -> "
+            "End: (%f, %f, %f)\n",
+            i,
+
+            Antenna[i].start_line[0],
+            Antenna[i].start_line[1],
+            Antenna[i].start_line[2],
+
+            Antenna[i].end_line[0],
+            Antenna[i].end_line[1],
+            Antenna[i].end_line[2]
+        );
+
+        DrawLine3D(
+            (Vector3){
+                Antenna[i].start_line[0],
+                Antenna[i].start_line[1],
+                Antenna[i].start_line[2]
+            },
+            (Vector3){
+                Antenna[i].end_line[0],
+                Antenna[i].end_line[1],
+                Antenna[i].end_line[2]
+            },
+            BLACK
+        );
+    }
+
+} else {
+
+    printf("antenna unsuccessfully rendered.\nABORTED LOADING\n");
+    return 1;
+} 
 
                 DrawLine3D((Vector3){0.0f,0.0f,0.0f},(Vector3){7.5f,0.0f,0.0f},ORANGE);
                 DrawLine3D((Vector3){0.0f,0.0f,0.0f},(Vector3){0.0f,7.5f,0.0f},BLUE);

@@ -60,7 +60,6 @@ Segment* init_antenna(int *n) {
 
     Segment plc_antenna[1]; //create placeholder values for json coordinates. Needed to find total number of sub segments within each segment, since you need the magnitude of each line.
 
-    int idx = 0; //global index for each subsemgne 
     for(int i = 0; i < *n; ++i){ //iterate over each segment that is in JSON file
         cJSON *first_segment = cJSON_GetArrayItem(segments,  i);
         
@@ -89,9 +88,13 @@ Segment* init_antenna(int *n) {
             //interate over number of sub_segments, and then knowning the sample_legnthfinally add true subsemgne initalization to main Antenna variabel
       }
   
-      Segment *Antenna = malloc(total_segments * sizeof(Segment));
+      Segment *Antenna = malloc(total_segments * sizeof(Segment)); //allocate Antenna based on total number of segments
       
+
+      int idx = 0; //index across all the for loops
       for(int i = 0; i < *n; ++i){
+
+          
             for(int m = 0; m < sub_segments; ++m){ // iterate over each sub segment within the segemnt
               //l looks too much like an i, we're using m cuz i can
             
@@ -110,7 +113,7 @@ Segment* init_antenna(int *n) {
                   //if m = sub_semgnets-1, the just add the endline directly line
                   
                   if(m == (sub_segments-1)){
-                    Antenna[idx].end_line[o] = plc_antenna[i].end_line[o-1];
+                    Antenna[idx].end_line[o] = plc_antenna[i].end_line[o];
                   }
                   else{
 
@@ -118,13 +121,15 @@ Segment* init_antenna(int *n) {
                     Antenna[idx].end_line[o] = Antenna[idx].start_line[o] + (cartesian_distance);
                   }
               }
+              idx++;
             }
-            idx++;
     }
 
     /*--------------------------------------------------------------------------------------------*/
 
-     return Antenna;
+
+    *n = total_segments; //set *n to new number of semgnts, since this is necceary for displaying
+    return Antenna;
 }
 
 
