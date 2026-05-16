@@ -18,8 +18,11 @@ int main(void)
     const int screenWidth = 800;
     const int screenHeight = 800;
     
+    float voltage;
     int n;
-    Segment* Antenna = init_antenna(&n);    
+    Segment* Antenna = init_antenna(&n, &voltage); 
+
+
 
     current_distribution(Antenna, n);
 
@@ -64,7 +67,7 @@ int main(void)
             ClearBackground(RAYWHITE);
 
             BeginMode3D(camera);
-            
+
            //printf("%ld", sizeof(Antenna));
             //drawing antenna
             if (Antenna != NULL) {
@@ -113,9 +116,6 @@ int main(void)
                 DrawLine3D((Vector3){0.0f,0.0f,0.0f},(Vector3){0.0f,7.5f,0.0f},BLUE);
                 DrawLine3D((Vector3){0.0f,0.0f,0.0f},(Vector3){0.0f,0.0f,7.5f},GREEN);
 
-                
-                
-            
             EndMode3D();
 
             Rectangle button_size = {700, 0, 100, 50};

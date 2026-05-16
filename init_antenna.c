@@ -7,9 +7,9 @@
 
 #define C 3e8
 
-Segment* init_antenna(int *n) {
+Segment* init_antenna(int *n, float *voltage) {
 
-    const int sample_rate = 10;
+    const int sample_rate = 1000;
 
     //JSON MUMBO JUMBO
         FILE *fp = fopen("antenna.json", "r");
@@ -48,6 +48,9 @@ Segment* init_antenna(int *n) {
     //grab frequency data from JSON
     cJSON *frequency = cJSON_GetObjectItem(json, "frequency");
     int frequency_value = frequency->valueint; 
+    
+    cJSON *voltage_json = cJSON_GetObjectItem(json, "voltage");
+    *voltage = voltage_json->valuedouble;
 
     //SET ANTENNA_CONSTANTS
     float wavelength = C / frequency_value; // wavelength of electron is c/f
