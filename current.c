@@ -10,6 +10,8 @@
 
 #define EPSILON 1e-6
 
+double complex greens_function(double r, double k);
+
 void current_distribution(Segment *Antenna, int size, float *voltage){
       
   //SET VOLTAGE VALUES
@@ -22,5 +24,8 @@ void current_distribution(Segment *Antenna, int size, float *voltage){
 
       }
   }
+}
 
+double complex greens_function(double r, double k){ //computing green's function with hemolt'z operator, which is used for 3D free space 
+    return (cexp(-I*k*r)/(4*M_PI*r));
 }
