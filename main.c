@@ -24,7 +24,7 @@ int main(void)
 
 
 
-    current_distribution(Antenna, n);
+    current_distribution(Antenna, n, &voltage);
 
     if(Antenna == NULL){printf("ERROR: ANTENNA CONFIGURATION INCORRECT. PLEASE CHECK JSON FILE\n");return 1;}
     
@@ -77,7 +77,8 @@ int main(void)
                   "Segment %d | "
                   "Start: (%f, %f, %f) -> "
                   "End: (%f, %f, %f) | "
-                  "Current: %f\n",
+                  "Midpoint: (%f, %f, %f) "
+                  "Voltage: %f\n",
 
                     i,
 
@@ -89,7 +90,11 @@ int main(void)
                       Antenna[i].end_line[1],
                       Antenna[i].end_line[2],
 
-                      Antenna[i].current
+                      Antenna[i].midpoint[0],
+                      Antenna[i].midpoint[1],
+                      Antenna[i].midpoint[2],
+
+                      Antenna[i].voltage
                 );
 
                 DrawLine3D(

@@ -9,7 +9,7 @@
 
 Segment* init_antenna(int *n, float *voltage) {
 
-    const int sample_rate = 1000;
+    const int sample_rate = 2;
 
     //JSON MUMBO JUMBO
         FILE *fp = fopen("antenna.json", "r");
@@ -124,7 +124,17 @@ Segment* init_antenna(int *n, float *voltage) {
                     Antenna[idx].end_line[o] = Antenna[idx].start_line[o] + (cartesian_distance);
                   }
               }
+
+              //calculate the midpoint of each subsegment
+
+              Antenna[idx].midpoint[0] = (Antenna[idx].start_line[0] + Antenna[idx].end_line[0]) / 2;
+              Antenna[idx].midpoint[1] = (Antenna[idx].start_line[1] + Antenna[idx].end_line[1]) / 2;
+              Antenna[idx].midpoint[2] = (Antenna[idx].start_line[2] + Antenna[idx].end_line[2]) / 2;
+
+
+
               idx++;
+
             }
     }
 
