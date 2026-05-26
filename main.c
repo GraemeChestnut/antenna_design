@@ -18,13 +18,15 @@ int main(void)
     const int screenWidth = 800;
     const int screenHeight = 800;
     
-    float voltage;
     int n;
-    Segment* Antenna = init_antenna(&n, &voltage); 
+    float voltage;
+    double wavelength;
+
+    Segment* Antenna = init_antenna(&n, &voltage, &wavelength); 
 
 
 
-    current_distribution(Antenna, n, &voltage);
+    current_distribution(Antenna, n, &voltage, wavelength);
 
     if(Antenna == NULL){printf("ERROR: ANTENNA CONFIGURATION INCORRECT. PLEASE CHECK JSON FILE\n");return 1;}
     

@@ -9,7 +9,7 @@ typedef struct{
         float midpoint[3];
 } Segment;
 
-void current_distribution(Segment *Antenna, int size, float *voltage);
+void current_distribution(Segment *Antenna, int size, float *voltage, double wavelength);
 
 
 #endif

@@ -7,9 +7,9 @@
 
 #define C 3e8
 
-Segment* init_antenna(int *n, float *voltage) {
+Segment* init_antenna(int *n, float *voltage, double *wavelength) {
 
-    const int sample_rate = 2;
+    const int sample_rate = 200; 
 
     //JSON MUMBO JUMBO
         FILE *fp = fopen("antenna.json", "r");
@@ -53,8 +53,8 @@ Segment* init_antenna(int *n, float *voltage) {
     *voltage = voltage_json->valuedouble;
 
     //SET ANTENNA_CONSTANTS
-    float wavelength = C / frequency_value; // wavelength of electron is c/f
-    float sample_length = wavelength/sample_rate; //sample_length is 1/10 of the wavelength
+    *wavelength = (double)(C / frequency_value); // wavelength of electron is c/f
+    float sample_length = *wavelength/(double)(sample_rate); //sample_length is 1/10 of the wavelength
     int total_segments = 0;
     float num_sub_segments[*n];
     int sub_segments;
@@ -86,7 +86,7 @@ Segment* init_antenna(int *n, float *voltage) {
             
                 
             //compute number of necceasry sub segments inside of each segment, absed on the magnitune of that segmnet. ie, more sub_semgent sfor large line
-            sub_segments = ceil( magnitude / sample_length);
+            sub_segments = ceil(magnitude / sample_length);
             total_segments += sub_segments;
             //interate over number of sub_segments, and then knowning the sample_legnthfinally add true subsemgne initalization to main Antenna variabel
       }
