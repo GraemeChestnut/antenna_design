@@ -74,7 +74,7 @@ int main(void)
             //drawing antenna
             if (Antenna != NULL) {
               for (int i = 0; i < n; ++i) {
-
+                /*
                 printf(
                   "Segment %d | "
                   "Start: (%f, %f, %f) -> "
@@ -97,7 +97,7 @@ int main(void)
                       Antenna[i].midpoint[2],
 
                       Antenna[i].voltage
-                );
+                );*/
 
                 DrawLine3D(
                     (Vector3){

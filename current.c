@@ -16,16 +16,24 @@ double compute_R(float *midpoint_m, float *midpoint_n);
 
 void current_distribution(Segment *Antenna, int size, float *voltage, double wavelength){
       
-  double k = (2 * M_PI)/wavelength;\
+  double k = (2 * M_PI)/wavelength;
 
-  double Z[size][size];
+  double complex (*Z)[size] = malloc(size * size * sizeof(double complex));
+  printf("size = %d\n", size);
+  printf("bytes needed = %zu\n", size * size * sizeof(double complex));
+
+  if(Z == NULL){
+      printf("malloc failed\n");
+      return;
+  }
+
   //SET VOLTAGE VALUES
   for(int i = 0; i < size; ++i){
       if(fabs(Antenna[i].start_line[0]) < (EPSILON) &&
         (fabs(Antenna[i].start_line[1]) < (EPSILON))&&
         (fabs(Antenna[i].start_line[2]) < (EPSILON)))
       
-      {
+     {
           Antenna[i].voltage = *voltage;
       }
       
@@ -38,10 +46,25 @@ void current_distribution(Segment *Antenna, int size, float *voltage, double wav
         pow(Antenna[i].midpoint[1] - Antenna[o].midpoint[1], 2) +
         pow(Antenna[i].midpoint[2] - Antenna[o].midpoint[2], 2)
         );
-
+        
+        if (i == o){
+          Z[i][o] = greens_function(EPSILON, k);
+        }
+        else{
         Z[i][o] = greens_function(r, k);
+        }
+
+printf("r[%d][%d] = %f   kR = %f   Z = %f + %fj\n", 
+            i, o, r, k*r, creal(Z[i][o]), cimag(Z[i][o]));
+
+
       }
-  }
+    }
+  
+  free(Z);
+  printf("k = %f\n", k);
+printf("wavelength = %f\n", wavelength);
+
 }
 
 
