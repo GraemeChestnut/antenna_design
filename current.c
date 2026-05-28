@@ -14,8 +14,11 @@
 double complex greens_function(double r, double k);
 double compute_R(float *midpoint_m, float *midpoint_n);
 
+
+
 void current_distribution(Segment *Antenna, int size, float *voltage, double wavelength){
       
+  int voltage_point;
   double beta = (2 * M_PI)/wavelength;
 
   double complex (*Z)[size] = malloc(size * size * sizeof(double complex));
@@ -32,11 +35,19 @@ void current_distribution(Segment *Antenna, int size, float *voltage, double wav
 
   //SET VOLTAGE VALUES
   for(int i = 0; i < size; ++i){
+
+
+       printf("seg[%d] midpoint = %f %f %f\n", i,
+        Antenna[i].midpoint[0],
+        Antenna[i].midpoint[1],
+        Antenna[i].midpoint[2]
+        );
       if(fabs(Antenna[i].start_line[0]) < (EPSILON) &&
         (fabs(Antenna[i].start_line[1]) < (EPSILON))&&
         (fabs(Antenna[i].start_line[2]) < (EPSILON)))
       
      {
+          voltage_point = i;
           Antenna[i].voltage = *voltage;
       }
       
@@ -56,7 +67,7 @@ void current_distribution(Segment *Antenna, int size, float *voltage, double wav
           else{
           Z[i][k] = greens_function(r, beta);
           }
-          printf(" r[%d][%d] Z = %f + %f ", i, k, creal(Z[i][k]), cimag(Z[i][k]));
+         // printf(" r[%d][%d] Z = %f + %f ", i, k, creal(Z[i][k]), cimag(Z[i][k]));
 
 
       }
@@ -101,21 +112,35 @@ void current_distribution(Segment *Antenna, int size, float *voltage, double wav
           
       printf("\n");
     }
+
+    double complex *y = calloc(size, sizeof(double complex));
+    for(int i = 0; i < size; ++i){
+        y[i]=Antenna[i].voltage;
+        for(int j = 0; j < i; ++j){
+          y[i] -= lower[i][j] * y[j];
+        }
+    }
+    double complex *Iant = malloc(size * sizeof(double complex));
+    for(int i = size-1; i >= 0; i--){
+        Iant[i] = y[i];
+        for(int j = i+1; j < size; j++){
+            Iant[i] -= upper[i][j] * Iant[j];
+        }
+        Iant[i] /= upper[i][i];
+    }
+    for(int i = 0; i < size; i++){
+        printf("I[%d] = %f + %fj\n", i, creal(Iant[i]), cimag(Iant[i]));
+    }
         
-  free(Z);
   printf("k = %f\n", beta);
 printf("wavelength = %f\n", wavelength);
 
 
 
-for(int i = 0; i < size; i++) {
-    for(int j = 0; j < size; j++) {
-        printf("%f + %f ",
-               creal(upper[i][j]),
-               cimag(upper[i][j]));
-    }
-    printf("\n");
-}
+
+
+double complex Z_in = Antenna[voltage_point].voltage / Iant[voltage_point];
+printf("Input Impedance = %f + %fj ohms\n", creal(Z_in), cimag(Z_in));
 
 free(Z);
 free(lower);
