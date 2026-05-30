@@ -6,6 +6,8 @@ typedef struct{
         float start_line[3];
         float end_line[3];
         float midpoint[3];
+        float tangent[3];
+
         float radius;
         double complex current;
         double complex voltage;

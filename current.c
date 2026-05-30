@@ -10,16 +10,13 @@
 
 #define EPSILON 1e-6
 
-
-double complex greens_function(double r, double k);
+double complex efie_kernel(double r, double k_variable, Vector3 s_hat, Vector3 s_hat_prime);
 double compute_R(float *midpoint_m, float *midpoint_n);
-
-
 
 void current_distribution(Segment *Antenna, int size, float *voltage, double wavelength){
       
   int voltage_point;
-  double beta = (2 * M_PI)/wavelength;
+  double k_variable = (2 * M_PI)/wavelength;
 
   double complex (*Z)[size] = malloc(size * size * sizeof(double complex));
   double complex (*upper)[size] = calloc(size * size, sizeof(double complex));
@@ -36,12 +33,10 @@ void current_distribution(Segment *Antenna, int size, float *voltage, double wav
   //SET VOLTAGE VALUES
   for(int i = 0; i < size; ++i){
 
+      printf("%f, %f, %f", Antenna[i].tangent[0], Antenna[i].tangent[1], Antenna[i].tangent[2]);
 
-       printf("seg[%d] midpoint = %f %f %f\n", i,
-        Antenna[i].midpoint[0],
-        Antenna[i].midpoint[1],
-        Antenna[i].midpoint[2]
-        );
+
+       
       if(fabs(Antenna[i].start_line[0]) < (EPSILON) &&
         (fabs(Antenna[i].start_line[1]) < (EPSILON))&&
         (fabs(Antenna[i].start_line[2]) < (EPSILON)))
@@ -61,12 +56,15 @@ void current_distribution(Segment *Antenna, int size, float *voltage, double wav
           pow(Antenna[i].midpoint[1] - Antenna[k].midpoint[1], 2) +
           pow(Antenna[i].midpoint[2] - Antenna[k].midpoint[2], 2)
           );
-          if(r == 0){r = EPSILON;}
+          if(r == 0) r = EPSILON;
+
           if (i == k){
-            Z[i][k] = greens_function(0.001, beta);
+            Z[i][k] = efie_kernel(0.001, k_variable, (Vector3){Antenna[i].tangent[0], Antenna[i].tangent[1], Antenna[i].tangent[2]} , 
+                                               (Vector3){Antenna[k].tangent[0], Antenna[k].tangent[1], Antenna[k].tangent[2]});
           }
           else{
-          Z[i][k] = greens_function(r, beta);
+             Z[i][k] = efie_kernel(r, k_variable, (Vector3){Antenna[i].tangent[0], Antenna[i].tangent[1], Antenna[i].tangent[2]} , 
+                                            (Vector3){Antenna[k].tangent[0], Antenna[k].tangent[1], Antenna[k].tangent[2]});
           }
          // printf(" r[%d][%d] Z = %f + %f ", i, k, creal(Z[i][k]), cimag(Z[i][k]));
 
@@ -74,10 +72,13 @@ void current_distribution(Segment *Antenna, int size, float *voltage, double wav
       }
 
   }
-
+    
+    //LU DECOMPOSITION
+    //
+    //
     for(int i = 0; i < size; ++i){
     
-       // upper triangular
+      // upper triangular
       for(int k = i; k < size; k++){
 
           double complex sum_U = 0 + 0.0*I;
@@ -90,7 +91,7 @@ void current_distribution(Segment *Antenna, int size, float *voltage, double wav
           //printf("%f + %fi\n", creal(sum_U), cimag(sum_U));
           upper[i][k] = Z[i][k] - sum_U;
       }
-      printf("\n");
+      //printf("\n");
 
       // lower triangular
       for(int k = i; k < size; k++){
@@ -111,9 +112,11 @@ void current_distribution(Segment *Antenna, int size, float *voltage, double wav
 
       }
           
-      printf("\n");
+     // printf("\n");
     }
-
+    
+    //SOLVE UL THROUGH FOWARD/BACK SUB
+    //
     double complex *y = calloc(size, sizeof(double complex));
     for(int i = 0; i < size; ++i){
         y[i]=Antenna[i].voltage;
@@ -130,6 +133,8 @@ void current_distribution(Segment *Antenna, int size, float *voltage, double wav
         Iant[i] /= upper[i][i];
     }
 
+
+    //DISPLAY COLOR FOR EACH SEGMENT BASED ON MAGNITUDE OF CURRENT
     int max;
     for(int i = 0; i < size; i++){
         printf("I[%d] = %.12e + %.12ej\n", i, creal(Iant[i]), cimag(Iant[i]));
@@ -148,24 +153,36 @@ void current_distribution(Segment *Antenna, int size, float *voltage, double wav
         }
     }
         
-  printf("k = %f\n", beta);
-printf("wavelength = %f\n", wavelength);
+  printf("k = %f\n", k_variable);
+  printf("wavelength = %f\n", wavelength);
 
 
 
 
 
-double complex Z_in = Antenna[voltage_point].voltage / Iant[voltage_point];
-printf("Input Impedance = %f + %fj ohms\n", creal(Z_in), cimag(Z_in));
+  double complex Z_in = Antenna[voltage_point].voltage / Iant[voltage_point];
+  printf("Input Impedance = %f + %fj ohms\n", creal(Z_in), cimag(Z_in));
 
-free(Z);
-free(lower);
-free(upper);
+  free(Z);
+  free(lower);
+  free(upper);
+  
 }
 
 
 
 
-double complex greens_function(double r, double beta){ //computing green's function with hemolt'z operator, which is used for 3D free space 
-    return (cexp(-I*beta*r)/(4*M_PI*r));
+double complex efie_kernel(double r, double k_variable, Vector3 s_hat, Vector3 s_hat_prime){ //computing green's function with hemolt'z operator, which is used for 3D free space 
+   
+
+  double dot_product_tangent = 
+    
+    s_hat.x * s_hat_prime.x + 
+    s_hat.y * s_hat_prime.y + 
+    s_hat.z * s_hat_prime.z;   
+
+  dot_product_tangent = k_variable * k_variable * dot_product_tangent;
+
+
+  return dot_product_tangent * (cexp(-I*k_variable*r)/(r));
 }

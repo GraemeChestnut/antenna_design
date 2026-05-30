@@ -9,9 +9,9 @@
 
 Segment* init_antenna(int *n, float *voltage, double *wavelength, float *radius) {
 
-    const int sample_rate = 5; 
+    const int sample_rate = 10; 
 
-    //JSON MUMBO JUMBO
+    //JSON MUMBO JUMBO5
         FILE *fp = fopen("antenna.json", "r");
         if (fp == NULL) {
             printf("Error: Unable to open the file.\n");
@@ -92,7 +92,10 @@ Segment* init_antenna(int *n, float *voltage, double *wavelength, float *radius)
             sub_segments = ceil(magnitude / sample_length);
             total_segments += sub_segments;
             //interate over number of sub_segments, and then knowning the sample_legnthfinally add true subsemgne initalization to main Antenna variabel
-      }
+            
+        
+  
+    }
   
       Segment *Antenna = malloc(total_segments * sizeof(Segment)); //allocate Antenna based on total number of segments
                                                                    
@@ -109,6 +112,8 @@ Segment* init_antenna(int *n, float *voltage, double *wavelength, float *radius)
             //
             cJSON *radius_JSON = cJSON_GetArrayItem(segments,  i);
             cJSON *radius_value = cJSON_GetObjectItem(radius_JSON, "radius");
+
+            //place tangent vectors into code
             
             if(radius_value == NULL){Antenna[i].radius = 0.01; printf("error: no radius is set or was formatted incorrectly, radius values for all segments set to 1cm");} //set radius to 1cm
             Antenna[i].radius = radius_value->valuedouble;
@@ -149,6 +154,19 @@ Segment* init_antenna(int *n, float *voltage, double *wavelength, float *radius)
               Antenna[idx].midpoint[1] = (Antenna[idx].start_line[1] + Antenna[idx].end_line[1]) / 2;
               Antenna[idx].midpoint[2] = (Antenna[idx].start_line[2] + Antenna[idx].end_line[2]) / 2;
 
+              //calaculate tangent vector of each subsegemnt
+
+              Antenna[idx].tangent[0] = Antenna[idx].end_line[0] - Antenna[idx].start_line[0];
+              Antenna[idx].tangent[1] = Antenna[idx].end_line[1] - Antenna[idx].start_line[1];
+              Antenna[idx].tangent[2] = Antenna[idx].end_line[2] - Antenna[idx].start_line[2];
+
+              double len = sqrt(Antenna[idx].tangent[0] * Antenna[idx].tangent[0] + Antenna[idx].tangent[1] * Antenna[idx].tangent[1] + Antenna[idx].tangent[2] * Antenna[idx].tangent[2]);
+
+              Antenna[idx].tangent[0] /= len;
+              Antenna[idx].tangent[1] /= len;
+              Antenna[idx].tangent[2] /= len;
+
+           
 
 
               idx++;
