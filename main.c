@@ -18,17 +18,17 @@ int main(void)
     const int screenWidth = 800;
     const int screenHeight = 800;
     
+    //setting antenna varibles
     int n;
     float voltage;
     double wavelength;
+    float radius;
 
-    Segment* Antenna = init_antenna(&n, &voltage, &wavelength); 
-
-
+    Segment* Antenna = init_antenna(&n, &voltage, &wavelength, &radius); 
 
     current_distribution(Antenna, n, &voltage, wavelength);
 
-    if(Antenna == NULL){printf("ERROR: ANTENNA CONFIGURATION INCORRECT. PLEASE CHECK JSON FILE\n");return 1;}
+    if(Antenna == NULL){printf("ERROR: ANTENNA CONFIGURATION FAILED. PLEASE CHECK JSON FILE CONFIGURATION\n");return 1;}
     
     //split each segments into more segments in order to do more math //
 
@@ -66,7 +66,7 @@ int main(void)
         //----------------------------------------------------------------------------------
         BeginDrawing();
 
-            ClearBackground(RAYWHITE);
+            ClearBackground(BLACK);
 
             BeginMode3D(camera);
 
@@ -99,7 +99,9 @@ int main(void)
                       Antenna[i].voltage
                 );*/
 
-                DrawLine3D(
+                //void DrawCylinderEx(Vector3 startPos, Vector3 endPos, float startRadius, float endRadius, int sides, Color color);
+                
+                DrawCylinderEx(
                     (Vector3){
                       Antenna[i].start_line[0],
                       Antenna[i].start_line[1],
@@ -109,8 +111,7 @@ int main(void)
                       Antenna[i].end_line[0],
                       Antenna[i].end_line[1],
                       Antenna[i].end_line[2]
-                      },
-                BLACK
+                      }, 0.01, 0.01, 100, RAYWHITE
                 );
               }
 

@@ -3,7 +3,7 @@
 
 #include "segment.h"
 
-Segment* init_antenna(int *n, float *voltage, double *wavelength);
+Segment* init_antenna(int *n, float *voltage, double *wavelength, float *radius);
 int edit_antenna(void);
 
 #endif

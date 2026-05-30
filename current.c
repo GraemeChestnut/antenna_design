@@ -50,6 +50,7 @@ void current_distribution(Segment *Antenna, int size, float *voltage, double wav
           voltage_point = i;
           Antenna[i].voltage = *voltage;
       }
+      else Antenna[i].voltage = 0;
       
       //computting R value
       for(int k = 0; k < size; ++k){
@@ -60,7 +61,7 @@ void current_distribution(Segment *Antenna, int size, float *voltage, double wav
           pow(Antenna[i].midpoint[1] - Antenna[k].midpoint[1], 2) +
           pow(Antenna[i].midpoint[2] - Antenna[k].midpoint[2], 2)
           );
-          
+          if(r == 0){r = EPSILON;}
           if (i == k){
             Z[i][k] = greens_function(0.001, beta);
           }
@@ -128,8 +129,23 @@ void current_distribution(Segment *Antenna, int size, float *voltage, double wav
         }
         Iant[i] /= upper[i][i];
     }
+
+    int max;
     for(int i = 0; i < size; i++){
-        printf("I[%d] = %f + %fj\n", i, creal(Iant[i]), cimag(Iant[i]));
+        printf("I[%d] = %.12e + %.12ej\n", i, creal(Iant[i]), cimag(Iant[i]));
+        Antenna[i].current = Iant[i];
+
+
+        if(creal(Antenna[i].voltage) > 0){
+          Antenna[i].color = (Color){255,0,0,255};
+          max = i;
+        }
+        if (creal(Antenna[i].current) <= 0.000001){
+          Antenna[i].color = (Color){0,255,0,255};
+        }
+        else {
+          Antenna[i].color = (Color){255,255,0,255};
+        }
     }
         
   printf("k = %f\n", beta);

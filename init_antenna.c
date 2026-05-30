@@ -7,9 +7,9 @@
 
 #define C 3e8
 
-Segment* init_antenna(int *n, float *voltage, double *wavelength) {
+Segment* init_antenna(int *n, float *voltage, double *wavelength, float *radius) {
 
-    const int sample_rate = 500; 
+    const int sample_rate = 5; 
 
     //JSON MUMBO JUMBO
         FILE *fp = fopen("antenna.json", "r");
@@ -19,7 +19,7 @@ Segment* init_antenna(int *n, float *voltage, double *wavelength) {
         }
 
         // read the file contents into a string
-        char buffer[1024];
+        char buffer[9182];
         int len = fread(buffer, 1, sizeof(buffer), fp);
         buffer[len] = '\0'; // null-terminate the string
         fclose(fp);
@@ -52,6 +52,8 @@ Segment* init_antenna(int *n, float *voltage, double *wavelength) {
     cJSON *voltage_json = cJSON_GetObjectItem(json, "voltage");
     *voltage = voltage_json->valuedouble;
 
+
+
     //SET ANTENNA_CONSTANTS
     *wavelength = (double)(C / frequency_value); // wavelength of electron is c/f
     float sample_length = *wavelength/(double)(sample_rate); //sample_length is 1/10 of the wavelength
@@ -76,6 +78,7 @@ Segment* init_antenna(int *n, float *voltage, double *wavelength) {
                 //store i segment insdie of plc holder array
                 plc_antenna[i].start_line[k] = start_line_value->valuedouble;
                 plc_antenna[i].end_line[k] = end_line_value->valuedouble;
+
             }
             
             //find magnitude of i segment
@@ -92,10 +95,25 @@ Segment* init_antenna(int *n, float *voltage, double *wavelength) {
       }
   
       Segment *Antenna = malloc(total_segments * sizeof(Segment)); //allocate Antenna based on total number of segments
+                                                                   
+      printf("total number of segments, like there shuold be 2: %d total segs,  %d init segm\n", total_segments, *n);
       
 
       int idx = 0; //index across all the for loops
       for(int i = 0; i < *n; ++i){
+
+
+            //place radius into code
+            //
+            //
+            //
+            cJSON *radius_JSON = cJSON_GetArrayItem(segments,  i);
+            cJSON *radius_value = cJSON_GetObjectItem(radius_JSON, "radius");
+            
+            if(radius_value == NULL){Antenna[i].radius = 0.01; printf("error: no radius is set or was formatted incorrectly, radius values for all segments set to 1cm");} //set radius to 1cm
+            Antenna[i].radius = radius_value->valuedouble;
+             
+            
 
           
             for(int m = 0; m < sub_segments; ++m){ // iterate over each sub segment within the segemnt
