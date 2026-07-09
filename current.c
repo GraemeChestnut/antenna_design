@@ -20,6 +20,7 @@ double dot(float a[3], float b[3])
 
 
 void lgwt(int N, double a, double b, double *x, double *w);
+double segment_length(Segment s);
 
 void current_distribution(Segment *Antenna, int size, float *voltage, double wavelength, int num_gauss, int number_of_children){
 
@@ -36,6 +37,15 @@ void current_distribution(Segment *Antenna, int size, float *voltage, double wav
 
   printf("\n\nhello mom, number of children %d", number_of_children);
   
+
+for(int i=0;i<size;i++)
+{
+    printf("%d tangent %f %f %f\n",
+        i,
+        Antenna[i].tangent[0],
+        Antenna[i].tangent[1],
+        Antenna[i].tangent[2]);
+}
 
   int total_elements = size;
   printf("\n%d\n", size);
@@ -154,8 +164,7 @@ for(int m = 0; m < size; m++)
                     sqrt(
                         dx*dx +
                         dy*dy +
-                        dz*dz +
-                        wire_radius*wire_radius
+                        dz*dz 
                     );
 
 
@@ -169,6 +178,7 @@ for(int m = 0; m < size; m++)
             }
 
 
+            
             A[m][n] =
                 I*w*mu
                 *
@@ -182,6 +192,9 @@ for(int m = 0; m < size; m++)
     }
 }
 
+
+printf("%e %e\n", creal(A[0][1]), cimag(A[0][1]));
+printf("%e %e\n", creal(A[1][0]), cimag(A[1][0]));
 
 //
 //----------------------------------------------------------------------
@@ -330,40 +343,36 @@ printf("------------------\n");
     }
 
 
-   
+  // END LU
+
+
+printf("\n--- LU DIAGONAL CHECK ---\n");
+
+for(int i=0;i<size;i++)
+{
+    printf("U[%d][%d] = %.6e + %.6ei\n",
+        i,
+        i,
+        creal(upper[i][i]),
+        cimag(upper[i][i]));
+} 
 
 
   free(A);
   free(lower);
   free(upper);
 
-printf("\n--- CURRENT DISTRIBUTION DEBUG ---\n");
-
-for(int i = 0; i < size; i++)
+for(int i=0;i<size;i++)
 {
-    printf("Segment %d:\n", i);
-
-    printf("  Start: (%f, %f, %f)\n",
-        Antenna[i].start_line[0],
-        Antenna[i].start_line[1],
-        Antenna[i].start_line[2]);
-
-    printf("  End:   (%f, %f, %f)\n",
-        Antenna[i].end_line[0],
-        Antenna[i].end_line[1],
-        Antenna[i].end_line[2]);
-
-    printf("  Current: %.12e + %.12ej\n",
-        creal(Iant[i]),
-        cimag(Iant[i]));
-
-    printf("  Magnitude: %.12e\n",
-        cabs(Iant[i]));
-
-    printf("---------------------------\n");
+    printf("%d %.8e %.8f\n",
+        i,
+        cabs(Iant[i]),
+        carg(Iant[i])*180/M_PI);
 }
-  
-}
+
+
+} 
+
 
 
 
