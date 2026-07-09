@@ -23,10 +23,11 @@ int main(void)
     float voltage;
     double wavelength;
     float radius;
+    int number_of_children; //number of subsegments per segment
 
-    Segment* Antenna = init_antenna(&n, &voltage, &wavelength, &radius); 
+    Segment* Antenna = init_antenna(&n, &voltage, &wavelength, &radius, &number_of_children); 
 
-    current_distribution(Antenna, n, &voltage, wavelength);
+    current_distribution(Antenna, n, &voltage, wavelength, 8, number_of_children);
 
     if(Antenna == NULL){printf("ERROR: ANTENNA CONFIGURATION FAILED. PLEASE CHECK JSON FILE CONFIGURATION\n");return 1;}
     

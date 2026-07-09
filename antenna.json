@@ -1,7 +1,7 @@
 {
     "number_of_segments": 2,
     "voltage": 1,
-    "frequency": 150000000,
+    "frequency": 75000000,
     "segments": [
         {
             "segment_id": 1,

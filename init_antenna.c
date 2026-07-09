@@ -7,7 +7,7 @@
 
 #define C 299792458
 
-Segment* init_antenna(int *n, float *voltage, double *wavelength, float *radius) {
+Segment* init_antenna(int *n, float *voltage, double *wavelength, float *radius, int *number_of_children) {
 
     const int sample_rate = 30; 
 
@@ -99,9 +99,9 @@ Segment* init_antenna(int *n, float *voltage, double *wavelength, float *radius)
         
   
     }
-  
+      
       Segment *Antenna = malloc(total_segments * sizeof(Segment)); //allocate Antenna based on total number of segments
-                                                                   
+      *number_of_children = sub_segments;
       //printf("total number of segments, like there shuold be 2: %d total segs,  %d init segm\n", total_segments, *n);
       
 
@@ -126,7 +126,7 @@ Segment* init_antenna(int *n, float *voltage, double *wavelength, float *radius)
           
             for(int m = 0; m < sub_segments; ++m){ // iterate over each sub segment within the segemnt
               //l looks too much like an i, we're using m cuz i can
-            
+
               for(int o = 0; o < 3; ++o){// iteatee over each coordinate within each segment
 
                  //insert code calaculating individual start/end points for each new line segment, its place should be building off of the previous line semgnet; segment[m].start_line = segment[m-1].end_line

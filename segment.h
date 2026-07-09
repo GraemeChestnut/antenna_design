@@ -16,7 +16,7 @@ typedef struct{
         Color color;
 } Segment;
 
-void current_distribution(Segment *Antenna, int size, float *voltage, double wavelength);
+void current_distribution(Segment *Antenna, int size, float *voltage, double wavelength, int num_gauss, int number_of_children);
 
 
 #endif
