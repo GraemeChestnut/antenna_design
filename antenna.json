@@ -1,20 +1,20 @@
 {
     "number_of_segments": 2,
     "voltage": 1,
-    "frequency": 75000000,
+    "frequency": 150000000,
     "segments": [
         {
             "segment_id": 1,
             "radius": 0.01,
             "start_line": [0.0, 0.0, 0.0],
-            "end_line": [0.707, 0.707, 0.0]
-            
+            "end_line": [1, 0, 0.0]
+          
         },
         {
             "segment_id": 2,
             "radius": 0.01,
             "start_line": [0.0, 0.0, 0.0],
-            "end_line": [0.707, -0.707, 0.0]
+            "end_line": [-1, 0, 0.0]
         }
     ]
 }

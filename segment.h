@@ -8,6 +8,8 @@ typedef struct{
         float midpoint[3];
         float tangent[3];
 
+        double frequency;
+
         float radius;
         double complex current;
         double complex voltage;

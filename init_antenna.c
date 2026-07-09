@@ -5,11 +5,11 @@
 
 #include "segment.h" 
 
-#define C 3e8
+#define C 299792458
 
 Segment* init_antenna(int *n, float *voltage, double *wavelength, float *radius) {
 
-    const int sample_rate = 10; 
+    const int sample_rate = 30; 
 
     //JSON MUMBO JUMBO5
         FILE *fp = fopen("antenna.json", "r");
@@ -53,9 +53,12 @@ Segment* init_antenna(int *n, float *voltage, double *wavelength, float *radius)
     *voltage = voltage_json->valuedouble;
 
 
-
+    
     //SET ANTENNA_CONSTANTS
-    *wavelength = (double)(C / frequency_value); // wavelength of electron is c/f
+    *wavelength = (C / (double)(frequency_value)); // wavelength of electron is c/f
+                                                 //
+                      printf("%f  \n", *wavelength);
+
     float sample_length = *wavelength/(double)(sample_rate); //sample_length is 1/10 of the wavelength
     int total_segments = 0;
     float num_sub_segments[*n];
@@ -99,7 +102,7 @@ Segment* init_antenna(int *n, float *voltage, double *wavelength, float *radius)
   
       Segment *Antenna = malloc(total_segments * sizeof(Segment)); //allocate Antenna based on total number of segments
                                                                    
-      printf("total number of segments, like there shuold be 2: %d total segs,  %d init segm\n", total_segments, *n);
+      //printf("total number of segments, like there shuold be 2: %d total segs,  %d init segm\n", total_segments, *n);
       
 
       int idx = 0; //index across all the for loops

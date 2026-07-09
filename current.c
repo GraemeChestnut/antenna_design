@@ -10,69 +10,42 @@
 
 #define EPSILON 1e-6
 
-double complex efie_kernel(double r, double k_variable, Vector3 s_hat, Vector3 s_hat_prime);
-double compute_R(float *midpoint_m, float *midpoint_n);
+double wire_radius = 1e-3;
+
+
+
 
 void current_distribution(Segment *Antenna, int size, float *voltage, double wavelength){
-      
-  int voltage_point;
-  double k_variable = (2 * M_PI)/wavelength;
+
+    
+
+  const double c = 299792458;
+  const double frequency = c/wavelength;
+  const double mu = 4e-7 * M_PI;
+  const double epsilon = 1.0/(mu*c*c);
+  const double w = 2.0 * M_PI * frequency;
+  const double k = w*sqrt(mu*epsilon);
+  const double eta = sqrt(mu/epsilon);
+
+  int total_elements = size;
+  double delta_z = sqrt(
+      pow(Antenna[0].end_line[0] - Antenna[0].start_line[0],2)+
+      pow(Antenna[0].end_line[1] - Antenna[0].start_line[1],2)+
+      pow(Antenna[0].end_line[2] - Antenna[0].start_line[2],2)
+      );
+
+  printf("\n hello\n%f,\n %d", delta_z, size);
+
 
   double complex (*Z)[size] = malloc(size * size * sizeof(double complex));
   double complex (*upper)[size] = calloc(size * size, sizeof(double complex));
   double complex (*lower)[size] = calloc(size * size, sizeof(double complex));
   
-   printf("size = %d\n", size);
-  printf("bytes needed = %zu\n", size * size * sizeof(double complex));
-
   if(Z == NULL){
       printf("malloc failed\n");
       return;
   }
 
-  //SET VOLTAGE VALUES
-  for(int i = 0; i < size; ++i){
-
-      printf("%f, %f, %f", Antenna[i].tangent[0], Antenna[i].tangent[1], Antenna[i].tangent[2]);
-
-
-       
-      if(fabs(Antenna[i].start_line[0]) < (EPSILON) &&
-        (fabs(Antenna[i].start_line[1]) < (EPSILON))&&
-        (fabs(Antenna[i].start_line[2]) < (EPSILON)))
-      
-     {
-          voltage_point = i;
-          Antenna[i].voltage = *voltage;
-      }
-      else Antenna[i].voltage = 0;
-      
-      //computting R value
-      for(int k = 0; k < size; ++k){
-        
-          double r = 
-          sqrt(
-          pow(Antenna[i].midpoint[0] - Antenna[k].midpoint[0], 2) +
-          pow(Antenna[i].midpoint[1] - Antenna[k].midpoint[1], 2) +
-          pow(Antenna[i].midpoint[2] - Antenna[k].midpoint[2], 2)
-          );
-          if(r == 0) r = EPSILON;
-
-          if (i == k){
-            Z[i][k] = efie_kernel(0.001, k_variable, (Vector3){Antenna[i].tangent[0], Antenna[i].tangent[1], Antenna[i].tangent[2]} , 
-                                               (Vector3){Antenna[k].tangent[0], Antenna[k].tangent[1], Antenna[k].tangent[2]});
-          }
-          else{
-             Z[i][k] = efie_kernel(r, k_variable, (Vector3){Antenna[i].tangent[0], Antenna[i].tangent[1], Antenna[i].tangent[2]} , 
-                                            (Vector3){Antenna[k].tangent[0], Antenna[k].tangent[1], Antenna[k].tangent[2]});
-          }
-         // printf(" r[%d][%d] Z = %f + %f ", i, k, creal(Z[i][k]), cimag(Z[i][k]));
-
-
-      }
-
-  }
-    
     //LU DECOMPOSITION
     //
     //
@@ -108,11 +81,11 @@ void current_distribution(Segment *Antenna, int size, float *voltage, double wav
               lower[k][i] = ((Z[k][i] - sum_L) / upper[i][i]);
           }
           //printf(" r[%d][%d] Z = %f + %f ", i, k, creal(lower[i][k]), cimag(lower[i][k]));
-          //printf(" r[%d][%d] Z = %f + %f ", i, k, creal(upper[i][k]), cimag(upper[i][k]));
+          //printf(" r[%d][%d] Z = %f + %f \n", i, k, creal(upper[i][k]), cimag(upper[i][k]));
 
       }
           
-     // printf("\n");
+     //printf("\n");
     }
     
     //SOLVE UL THROUGH FOWARD/BACK SUB
@@ -134,34 +107,8 @@ void current_distribution(Segment *Antenna, int size, float *voltage, double wav
     }
 
 
-    //DISPLAY COLOR FOR EACH SEGMENT BASED ON MAGNITUDE OF CURRENT
-    int max;
-    for(int i = 0; i < size; i++){
-        printf("I[%d] = %.12e + %.12ej\n", i, creal(Iant[i]), cimag(Iant[i]));
-        Antenna[i].current = Iant[i];
+   
 
-
-        if(creal(Antenna[i].voltage) > 0){
-          Antenna[i].color = (Color){255,0,0,255};
-          max = i;
-        }
-        if (creal(Antenna[i].current) <= 0.000001){
-          Antenna[i].color = (Color){0,255,0,255};
-        }
-        else {
-          Antenna[i].color = (Color){255,255,0,255};
-        }
-    }
-        
-  printf("k = %f\n", k_variable);
-  printf("wavelength = %f\n", wavelength);
-
-
-
-
-
-  double complex Z_in = Antenna[voltage_point].voltage / Iant[voltage_point];
-  printf("Input Impedance = %f + %fj ohms\n", creal(Z_in), cimag(Z_in));
 
   free(Z);
   free(lower);
@@ -170,19 +117,22 @@ void current_distribution(Segment *Antenna, int size, float *voltage, double wav
 }
 
 
-
-
-double complex efie_kernel(double r, double k_variable, Vector3 s_hat, Vector3 s_hat_prime){ //computing green's function with hemolt'z operator, which is used for 3D free space 
-   
-
-  double dot_product_tangent = 
+double dot(Vector3 a, Vector3 b){
     
-    s_hat.x * s_hat_prime.x + 
-    s_hat.y * s_hat_prime.y + 
-    s_hat.z * s_hat_prime.z;   
+    return
 
-  dot_product_tangent = k_variable * k_variable * dot_product_tangent;
+    a.x * b.x + 
+    a.y * b.y + 
+    a.z * b.z; 
 
-
-  return dot_product_tangent * (cexp(-I*k_variable*r)/(r));
 }
+
+double segment_length(Segment s)
+{
+    double dx = s.end_line[0] - s.start_line[0];
+    double dy = s.end_line[1] - s.start_line[1];
+    double dz = s.end_line[2] - s.start_line[2];
+
+    return sqrt(dx*dx + dy*dy + dz*dz);
+}
+
