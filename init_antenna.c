@@ -9,7 +9,7 @@
 
 Segment* init_antenna(int *n, float *voltage, double *wavelength, float *radius, int *number_of_children) {
 
-    const int sample_rate = 30; 
+    const int sample_rate = 300; 
 
     //JSON MUMBO JUMBO5
         FILE *fp = fopen("antenna.json", "r");

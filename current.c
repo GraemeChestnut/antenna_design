@@ -201,7 +201,11 @@ printf("%e %e\n", creal(A[1][0]), cimag(A[1][0]));
 double complex *V = calloc(size, sizeof(double complex));
 
 // find first segment starting at origin
-int feed_segment = -1;
+//
+// create delta gap source, 
+//
+// NOTE THIS ONLY WORKS WHEN TWO SEGMENTS ARE POSITIONED AT THE FEED POINT, OTHERWISE, IT WILL BREAK DOWN
+bool is_feed_segment = false;
 
 for(int i = 0; i < size; i++)
 {
@@ -213,49 +217,25 @@ for(int i = 0; i < size; i++)
        fabs(y) < 1e-9 &&
        fabs(z) < 1e-9)
     {
-        feed_segment = i;
-        break;
+        if (is_feed_segment == false)
+        {
+          V[i] = 0.5;
+        }
+        else {
+          V[i] = -0.5;
+        }
+
+        is_feed_segment = true;
     }
 }
 
 
-if(feed_segment == -1)
+if(is_feed_segment == -1)
 {
     printf("No feed segment found!\n");
     return;
 }
 
-
-printf("Feed segment = %d\n", feed_segment);
-
-
-// 1 volt excitation
-V[feed_segment] = 1.0;
-
-
-printf("\n--- FEED DEBUG ---\n");
-
-printf("Selected feed segment: %d\n", feed_segment);
-
-printf("Start point: (%f, %f, %f)\n",
-       Antenna[feed_segment].start_line[0],
-       Antenna[feed_segment].start_line[1],
-       Antenna[feed_segment].start_line[2]);
-
-printf("End point: (%f, %f, %f)\n",
-       Antenna[feed_segment].end_line[0],
-       Antenna[feed_segment].end_line[1],
-       Antenna[feed_segment].end_line[2]);
-
-printf("Tangent: (%f, %f, %f)\n",
-       Antenna[feed_segment].tangent[0],
-       Antenna[feed_segment].tangent[1],
-       Antenna[feed_segment].tangent[2]);
-
-printf("Midpoint: (%f, %f, %f)\n",
-       Antenna[feed_segment].midpoint[0],
-       Antenna[feed_segment].midpoint[1],
-       Antenna[feed_segment].midpoint[2]);
 
 printf("Voltage vector:\n");
 
